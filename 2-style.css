@@ -1,0 +1,51 @@
+/* ===== ÍNDICE: 1 Base · 2 Bienvenida · 3 Cabecera y menú · 4 Tarjetas y formularios · 5 Botones · 6 Resultados ===== */
+
+/* 1. Base */
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,sans-serif;background:#f4f5f7;color:#1c1f26}
+[hidden]{display:none!important}
+
+/* 2. Bienvenida */
+.bienvenida{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#1f3a5f;padding:20px}
+.bienvenida-caja{background:#fff;border-radius:16px;padding:28px 22px;text-align:center;max-width:360px}
+.icono{font-size:48px}
+
+/* 3. Cabecera y menú */
+.cabecera{background:#1f3a5f;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:baseline}
+.cabecera h1{margin:0;font-size:18px}.cabecera span{font-size:12px;opacity:.8}
+.aviso-ejemplo{background:#fff3cd;color:#664d03;padding:10px 16px;font-size:13px;font-weight:600}
+.menu{display:flex;gap:6px;padding:10px 12px;background:#fff;border-bottom:1px solid #dde}
+.pestana{flex:1;border:0;background:#eef1f6;padding:10px 4px;border-radius:8px;font-size:13px;cursor:pointer;position:relative}
+.pestana.activa{background:#1f3a5f;color:#fff}
+main{max-width:700px;margin:0 auto;padding:14px}
+.panel{display:none}.panel.activo{display:block}
+
+/* 4. Tarjetas y formularios */
+.tarjeta{background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px #0002}
+label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}
+input,select,textarea{width:100%;padding:9px;border:1px solid #c8cfdb;border-radius:8px;font:inherit}
+textarea{min-height:70px}
+.funcion{display:grid;grid-template-columns:1fr 44px;gap:6px;margin-bottom:10px}.funcion input{grid-column:1/3}
+.nota{font-size:12px;color:#666}
+
+/* 5. Botones: todos con la misma altura */
+.boton{height:42px;padding:0 14px;border:0;border-radius:8px;background:#2e7d32;color:#fff;font-size:14px;cursor:pointer}
+.boton.secundario{background:#e3e8ef;color:#1c1f26}
+.fila-botones{display:flex;gap:8px}.fila-botones .boton{flex:1}
+.borrar-fila{height:auto;border:0;background:#fde2e2;border-radius:8px;cursor:pointer}
+.pie{margin-top:6px}
+
+/* 6. Resultados */
+h3{margin:12px 0 4px}ul{margin:4px 0 8px;padding-left:20px}
+pre{white-space:pre-wrap;background:#0f1722;color:#e6edf6;padding:12px;border-radius:10px;font-size:12px}
+table{width:100%;border-collapse:collapse}td{padding:6px 2px;border-bottom:1px solid #eee;font-size:14px}td:last-child{text-align:right}
+.total{font-size:22px;font-weight:700;color:#1f3a5f}
+
+/* 7. Recorrido de la idea */
+summary{cursor:pointer;font-weight:600}
+.etiqueta{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;margin-right:6px}
+.hecho{background:#dff3e0;color:#1b5e20}.propuesta{background:#dbe8fb;color:#1f3a5f}.incognita{background:#fde8c8;color:#7a4a00}.supuesto{background:#eee;color:#444}
+.decision{border:1px solid #dde;border-radius:10px;padding:10px;margin:8px 0}
+.decision p{margin:0 0 6px}.opciones{display:flex;gap:6px}
+.opciones button{flex:1;height:38px;border:0;border-radius:8px;background:#e3e8ef;cursor:pointer;font-size:13px}
+.opciones button.elegida{background:#1f3a5f;color:#fff}

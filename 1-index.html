@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Planificador de Apps (borrador)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Pantalla de bienvenida -->
+<div id="pantalla-bienvenida" class="bienvenida">
+  <div class="bienvenida-caja">
+    <div class="icono">🛠️</div>
+    <h1>Planificador de Apps</h1>
+    <p>Convierte una idea en un plan, unas instrucciones para la IA y un presupuesto.</p>
+    <button id="boton-entrar" class="boton">Entrar</button>
+    <p class="nota">Borrador v0.1 · sin IA · los datos se guardan solo en este navegador.</p>
+  </div>
+</div>
+
+<div id="pantalla-app" hidden>
+  <header class="cabecera"><h1>Planificador de Apps</h1><span>borrador v0.1</span></header>
+  <div id="aviso-ejemplo" class="aviso-ejemplo" hidden>EJEMPLO FICTICIO: estos datos no son de ningún cliente real. Pulsa «Vaciar todo» para vaciarlos.</div>
+  <nav class="menu">
+    <button class="pestana activa" data-pestana="idea">1 Idea</button>
+    <button class="pestana" data-pestana="plan">2 Plan</button>
+    <button class="pestana" data-pestana="instrucciones">3 Instrucciones</button>
+    <button class="pestana" data-pestana="presupuesto">4 Presupuesto</button>
+  </nav>
+  <main>
+    <!-- PESTAÑA 1: PLAN -->
+    <section id="idea" class="panel activo">
+      <div class="tarjeta">
+        <label>Nombre del proyecto</label><input id="nombre" placeholder="Ej. nombre del negocio o cliente">
+        <label>Idea (qué problema resuelve)</label><textarea id="texto-idea"></textarea>
+      </div>
+      <div class="tarjeta" id="recorrido"></div>
+      <details class="tarjeta"><summary>Preguntas avanzadas (opcional)</summary>
+        <p class="nota">Responde con tus palabras. La herramienta no juzga si la idea es buena: te señala lo que aún no has contestado y te hace preguntas difíciles.</p>
+        <label>1. ¿Quién es el cliente concreto? (un negocio real, no «las pymes»)</label><textarea id="cliente"></textarea>
+        <label>2. ¿Qué problema tiene hoy y cuánto le molesta?</label><textarea id="problema"></textarea>
+        <label>3. ¿Cómo lo resuelve ahora? (papel, Excel, otra app…)</label><textarea id="hoyhacen"></textarea>
+        <label>4. ¿Por qué iba a cambiar y pagar por tu solución?</label><textarea id="porque"></textarea>
+        <label>5. ¿Qué apps parecidas existen ya?</label><textarea id="competencia"></textarea>
+        <label>6. ¿Cómo lo comprobarías esta semana con 3 personas reales?</label><textarea id="validacion"></textarea>
+        <label>7. ¿Cómo sabrás que ha funcionado? (un número)</label><textarea id="metrica"></textarea>
+        <label>8. ¿Qué datos personales o de dinero manejará?</label><textarea id="datos"></textarea>
+      </details>
+      <div class="tarjeta" id="resultado-idea"></div>
+    </section>
+
+    <section id="plan" class="panel">
+      <div class="tarjeta">
+        <label>Tipo de producto</label>
+        <select id="tipo"><option>Aplicación de gestión (web)</option><option>Web de presentación</option><option>Tienda online</option><option>Reservas / citas</option><option>App instalable (PWA)</option><option>Herramienta interna</option></select>
+        <label>País</label><input id="pais" placeholder="Ej. España">
+        <label>Contexto (quién la usará y cómo trabaja hoy)</label><textarea id="contexto"></textarea>
+        <label>Funciones y prioridad (la eliges tú)</label>
+        <div id="lista-funciones"></div>
+        <button id="boton-anadir" class="boton secundario">+ Añadir función</button>
+      </div>
+      <div class="tarjeta" id="resultado-plan"></div>
+      <p class="nota">El plan solo ordena lo que tú escribes y priorizas. No es una validación de la idea ni un estudio de mercado.</p>
+    </section>
+
+    <!-- PESTAÑA 2: INSTRUCCIONES -->
+    <section id="instrucciones" class="panel">
+      <div class="tarjeta">
+        <label>Herramienta destino</label>
+        <select id="herramienta"><option>Lovable</option><option>Bolt</option><option>Cursor / Codex</option><option>Otra</option></select>
+        <label>Estilo visual</label><input id="estilo" placeholder="Ej. limpio, azul oscuro, botones grandes">
+        <label>Datos extra (logo, colores, textos)</label><textarea id="extra"></textarea>
+        <div class="fila-botones"><button id="boton-copiar" class="boton">Copiar</button></div>
+      </div>
+      <pre id="resultado-instrucciones"></pre>
+    </section>
+
+    <!-- PESTAÑA 3: PRESUPUESTO -->
+    <section id="presupuesto" class="panel">
+      <div class="tarjeta">
+        <label>Horas de trabajo estimadas</label><input id="horas" type="number" min="0" placeholder="0">
+        <label>Tu precio por hora (€)</label><input id="precio-hora" type="number" min="0" placeholder="0">
+        <label>Gastos únicos (dominio, diseño…) €</label><input id="gastos-unicos" type="number" min="0" placeholder="0">
+        <label>Coste mensual de servicios (hosting, IA…) €</label><input id="gastos-mes" type="number" min="0" placeholder="0">
+        <label>Horas de mantenimiento al mes</label><input id="horas-mes" type="number" min="0" placeholder="0">
+        <label>Imprevistos %</label><input id="imprevistos" type="number" min="0" placeholder="0">
+        <label>IVA % (lo pones tú)</label><input id="iva" type="number" min="0" placeholder="0">
+      </div>
+      <div class="tarjeta" id="resultado-presupuesto"></div>
+      <p class="nota">Solo calcula con los números que introduces. No sugiere precios de mercado.</p>
+    </section>
+
+    <div class="fila-botones pie">
+      <button id="boton-guardar" class="boton">Guardar</button>
+      <button id="boton-ejemplo" class="boton secundario">Ver ejemplo</button>
+      <button id="boton-borrar" class="boton secundario">Vaciar todo</button>
+    </div>
+    <p id="mensaje" class="nota"></p>
+  </main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
