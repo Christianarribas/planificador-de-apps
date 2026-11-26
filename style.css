@@ -86,3 +86,18 @@ select option{background:#0f172a;color:#e2e8f0}
 .total{color:#5eead4}
 .cabecera span{opacity:.9}
 input:focus,select:focus,textarea:focus{outline:2px solid #14b8a6;border-color:#14b8a6}
+
+/* 9. Estimación por partes y escenario de tarifa (presupuesto) */
+.titulo-tarjeta{margin:0 0 6px;font-size:16px}
+.parte{display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid #334155;border-radius:10px;margin:7px 0;background:#16203a}
+.parte-texto{flex:1;font-size:14px}
+.rango{display:block;font-size:12px;color:#94a3b8}
+.parte-texto input{padding:6px}
+.parte-horas{width:72px;flex:none;text-align:center}
+.parte .borrar-fila{flex:none;padding:6px 8px}
+#suma-partes{margin:8px 0}
+#tarifa-orientativa{margin:10px 0 0;color:#5eead4}
+#boton-usar-horas,#boton-usar-tarifa{margin:4px 0 8px}
+#boton-anadir-parte{margin-top:4px}
+#boton-usar-horas:disabled,#boton-usar-tarifa:disabled{opacity:.45;cursor:default}
+.aviso-parcial{background:#451a03;color:#fdba74;padding:8px 10px;border-radius:8px;font-size:13px;margin:0 0 8px}
