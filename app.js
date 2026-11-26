@@ -1,4 +1,4 @@
-/* ===== ÍNDICE: 1 Datos · 2 Guardado · 3 Pantalla · 4 Plan · 5 Instrucciones · 6 Presupuesto · 7 Arranque ===== */
+/* ===== ÍNDICE: 1 Datos · 2 Guardado · 3 Pantalla · 4 Plan · 5 Instrucciones · 6 Presupuesto · 6a Partes · 6b Escenario de tarifa · 7 Arranque ===== */
 
 /* 1. DATOS: todo lo que escribe el usuario vive en este objeto */
 const CLAVE = 'planificador-proyecto';
@@ -9,7 +9,8 @@ function proyectoVacio() {
   return { esEjemplo: false, nombre: '', idea: '', tipo: 'Aplicación de gestión (web)', pais: '', contexto: '',
     cliente: '', problema: '', hoyhacen: '', porque: '', competencia: '', validacion: '', metrica: '', datos: '',
     decisiones: {}, funciones: [], herramienta: 'Lovable', estilo: '', extra: '',
-    horas: '', precioHora: '', gastosUnicos: '', gastosMes: '', horasMes: '', imprevistos: '', iva: '' };
+    partes: {}, horas: '', ganarMes: '', horasFacturables: '', precioHora: '',
+    gastosUnicos: '', gastosMes: '', horasMes: '', imprevistos: '', iva: '' };
 }
 // Ejemplo ficticio: solo se carga si el usuario pulsa «Cargar ejemplo»
 function proyectoEjemplo() {
@@ -19,12 +20,14 @@ function proyectoEjemplo() {
       { texto: 'Presupuestos en PDF', prioridad: 'Deseable' }, { texto: 'Estadísticas del mes', prioridad: 'Futuro' }],
     cliente: 'Un taller ficticio de 3 personas.', problema: 'Pierden citas y presupuestos apuntados en papel.', hoyhacen: 'Papel y WhatsApp.', porque: '', competencia: '', validacion: '', metrica: '', datos: 'Nombres, teléfonos y matrículas de clientes.',
     herramienta: 'Lovable', estilo: 'Limpio, azul oscuro, botones grandes', extra: '',
-    horas: '20', precioHora: '20', gastosUnicos: '30', gastosMes: '10', horasMes: '1', imprevistos: '10', iva: '21' };
+    partes: {},
+    horas: '20', ganarMes: '1000', horasFacturables: '50', precioHora: '20', gastosUnicos: '30', gastosMes: '10', horasMes: '1', imprevistos: '10', iva: '21' };
 }
 
 const $ = id => document.getElementById(id);
 const CAMPOS = { cliente: 'cliente', problema: 'problema', hoyhacen: 'hoyhacen', porque: 'porque', competencia: 'competencia', validacion: 'validacion', metrica: 'metrica', datos: 'datos', nombre: 'nombre', idea: 'texto-idea', tipo: 'tipo', pais: 'pais', contexto: 'contexto', herramienta: 'herramienta',
   estilo: 'estilo', extra: 'extra', horas: 'horas', precioHora: 'precio-hora', gastosUnicos: 'gastos-unicos',
+  ganarMes: 'ganar-mes', horasFacturables: 'horas-facturables',
   gastosMes: 'gastos-mes', horasMes: 'horas-mes', imprevistos: 'imprevistos', iva: 'iva' };
 
 /* 2. GUARDADO: solo en localStorage de este navegador, y solo al pulsar «Guardar» */
@@ -36,7 +39,7 @@ function mensaje(t) { $('mensaje').textContent = t; }
 function pintarCampos() {
   for (const k in CAMPOS) $(CAMPOS[k]).value = proyecto[k];
   $('aviso-ejemplo').hidden = !proyecto.esEjemplo;
-  pintarFunciones(); recalcular();
+  pintarFunciones(); pintarPartes(); recalcular();
 }
 function leerCampos() {
   for (const k in CAMPOS) proyecto[k] = $(CAMPOS[k]).value;
@@ -94,13 +97,19 @@ function pintarPresupuesto() {
   const trabajo = n(p.horas) * n(p.precioHora), unicos = n(p.gastosUnicos), imprev = (trabajo + unicos) * n(p.imprevistos) / 100;
   const base = trabajo + unicos + imprev, mes = n(p.gastosMes) + n(p.horasMes) * n(p.precioHora), iva = n(p.iva) / 100;
   const e = x => x.toFixed(2).replace('.', ',') + ' €';
-  $('resultado-presupuesto').innerHTML = '<table>'
+  // Sin horas o sin tarifa no hay presupuesto: los totales solo suman lo cubierto y se avisa bien visible
+  const faltaT = !(n(p.horas) > 0), faltaP = !(n(p.precioHora) > 0), incompleto = faltaT || faltaP;
+  const aviso = incompleto ? '<p class="aviso-parcial"><b>Presupuesto incompleto:</b> falta '
+    + (faltaT && faltaP ? 'poner las horas de trabajo y tu precio por hora' : faltaT ? 'poner las horas de trabajo' : 'poner tu precio por hora')
+    + '. Los totales de abajo suman solo lo que has cubierto; no es el precio final.</p>' : '';
+  $('resultado-presupuesto').innerHTML = aviso + '<table>'
     + '<tr><td>Trabajo</td><td>' + e(trabajo) + '</td></tr><tr><td>Gastos únicos</td><td>' + e(unicos) + '</td></tr>'
-    + '<tr><td>Imprevistos</td><td>' + e(imprev) + '</td></tr><tr><td><b>Pago único sin IVA</b></td><td><b>' + e(base) + '</b></td></tr>'
-    + '<tr><td>Con IVA (' + n(p.iva) + ' %)</td><td>' + e(base * (1 + iva)) + '</td></tr>'
-    + '<tr><td><b>Mantenimiento/mes sin IVA</b></td><td><b>' + e(mes) + '</b></td></tr>'
+    + '<tr><td>Imprevistos</td><td>' + e(imprev) + '</td></tr><tr><td><b>' + (incompleto ? 'Total parcial sin IVA' : 'Pago único sin IVA') + '</b></td><td><b>' + e(base) + '</b></td></tr>'
+    + '<tr><td>Con IVA (' + n(p.iva) + ' %)' + (incompleto ? ' (parcial)' : '') + '</td><td>' + e(base * (1 + iva)) + '</td></tr>'
+    + '<tr><td><b>Mantenimiento/mes sin IVA</b>' + (incompleto ? ' (parcial)' : '') + '</td><td><b>' + e(mes) + '</b></td></tr>'
     + '<tr><td>Mantenimiento/mes con IVA</td><td>' + e(mes * (1 + iva)) + '</td></tr></table>'
-    + '<p class="total">' + e(base) + ' + ' + e(mes) + '/mes</p>' + (p.esEjemplo ? '<p class="nota">Importes del ejemplo ficticio.</p>' : '');
+    + (incompleto ? '<p class="total">Incompleto: de momento solo suma ' + e(base) + ' + ' + e(mes) + '/mes</p>' : '<p class="total">' + e(base) + ' + ' + e(mes) + '/mes</p>')
+    + (p.esEjemplo ? '<p class="nota">Importes del ejemplo ficticio.</p>' : '');
 }
 
 /* 4a. RECORRIDO: reconoce el tema por palabras y propone decisiones. Son propuestas de diseño, no obligaciones legales verificadas */
@@ -185,18 +194,138 @@ function pintarIdea() {
   h += '<h3>Alcance</h3><p>' + (imprescind === 0 ? 'Aún no marcaste funciones imprescindibles (pestaña Plan).' : 'Tienes ' + imprescind + ' marcadas como imprescindibles. El número no mide la complejidad: una sola función (pagos, cuentas, tiempo real) puede ser más difícil que cinco sencillas. Pregúntate cuál es la mínima que ya sirve a un cliente real.') + '</p>';
   $('resultado-idea').innerHTML = h;
 }
-function recalcular() { leerCampos(); pintarRecorrido(); pintarIdea(); pintarPlan(); pintarInstrucciones(); pintarPresupuesto(); }
+function recalcular() { leerCampos(); pintarRecorrido(); pintarIdea(); pintarPlan(); pintarInstrucciones(); pintarTarifa(); pintarPresupuesto(); }
+
+/* 6a. PARTES: lo que incluye la versión 1, sacado de las decisiones del usuario. Las horas las pone él; la herramienta solo suma */
+const PARTES_FIJAS = [
+  ['f-diseno', 'Diseño y estructura de la app'],
+  ['f-almacenamiento', 'Dónde se guardan los datos (en el navegador o en un servidor)'],
+  ['f-datos', 'Datos y privacidad (aviso, guardado, borrado)'],
+  ['f-pruebas', 'Pruebas con usuarios reales y correcciones'],
+  ['f-puesta', 'Puesta en marcha (dominio, publicación)']];
+// Referencias de horas por tarea: juicio orientativo para una versión sencilla hecha con ayuda de IA, con mucha incertidumbre
+const REFS = {
+  'f-diseno': [3, 8], 'f-almacenamiento': [1, 6], 'f-datos': [1, 4], 'f-pruebas': [3, 8], 'f-puesta': [1, 3],
+  'f-acceso': [2, 6], 'c-editar': [2, 6],
+  'r-form': [2, 5], 'r-aforo': [2, 4], 'r-estado': [1, 3], 'r-dia': [2, 4], 'r-aviso': [3, 8],
+  'c-lista': [1, 3], 'c-ocultar': [1, 2], 'c-alergenos': [1, 3], 'c-qr': [1, 2], 'c-fotos': [1, 3] };
+function referenciaDe(id) { return REFS[id.startsWith('p-') ? id.slice(2) : id] || null; }
+// Las funciones imprescindibles son agrupadores: solo se estiman aparte si no las cubre ningún tema reconocido
+function funcionesSinTema() {
+  const temas = temasDetectados();
+  return proyecto.funciones.filter(f => f.texto.trim() && f.prioridad === 'Imprescindible' && !temas.some(c => c.detecta.test(f.texto)));
+}
+function partesDecididas() {
+  const v1 = propuestasActivas().filter(x => proyecto.decisiones[x.id] === 'v1').map(x => ['p-' + x.id, x.texto]);
+  const fun = funcionesSinTema().map(f => ['fun-' + f.texto.trim().toLowerCase(), f.texto.trim()]);
+  // Gestionar datos (ver reservas, tocar la carta) exige entrar de forma segura y poder editar: se estiman aparte
+  const gestion = [];
+  if (v1.length) gestion.push(['f-acceso', 'Acceso protegido a la zona de gestión (entrar de forma segura)']);
+  if (v1.some(([id]) => id.indexOf('p-c-') === 0)) gestion.push(['c-editar', 'Edición de la carta por el restaurante (cambiar platos, precios y categorías)']);
+  return PARTES_FIJAS.concat(gestion, v1, fun);
+}
+function sincronizarPartes() {
+  const queridas = {};
+  partesDecididas().forEach(([id, texto]) => { queridas[id] = texto; });
+  for (const id in proyecto.partes) {
+    if (id.startsWith('x-')) continue; // las partes añadidas a mano no se tocan
+    if (!(id in queridas)) delete proyecto.partes[id];
+    else proyecto.partes[id].texto = queridas[id];
+  }
+  for (const id in queridas) if (!(id in proyecto.partes)) proyecto.partes[id] = { texto: queridas[id], horas: '' };
+}
+function excluidas() {
+  const dec = propuestasActivas().filter(x => ['despues', 'no'].includes(proyecto.decisiones[x.id])).map(x => x.texto);
+  const fun = proyecto.funciones.filter(f => f.texto.trim() && f.prioridad !== 'Imprescindible').map(f => f.texto.trim() + ' (' + f.prioridad.toLowerCase() + ')');
+  return dec.concat(fun);
+}
+function sumaPartes() { let s = 0; for (const id in proyecto.partes) s += parseFloat(proyecto.partes[id].horas) || 0; return s; }
+function partesSinHoras() { return Object.keys(proyecto.partes).filter(id => !(parseFloat(proyecto.partes[id].horas) > 0)).length; }
+function pintarSuma() {
+  const s = sumaPartes(), faltan = partesSinHoras(), total = Object.keys(proyecto.partes).length, b = $('boton-usar-horas');
+  if (!total) { $('suma-partes').textContent = 'Añade partes o decide la versión 1 en Idea y Plan.'; b.disabled = true; b.textContent = 'Usar estas horas'; return; }
+  if (faltan) {
+    $('suma-partes').textContent = 'Suma parcial: ' + s + ' h, pero faltan horas en ' + faltan + ' de ' + total + ' partes. No es la estimación completa.';
+    b.disabled = true; b.textContent = 'Faltan horas en ' + faltan + ' partes';
+  } else {
+    $('suma-partes').textContent = 'Suma completa: ' + s + ' h (todas las partes tienen horas). No se copian solas: usa el botón si quieres llevarlas abajo.';
+    b.disabled = false; b.textContent = 'Usar ' + s + ' h en horas estimadas';
+  }
+}
+function pintarPartes() {
+  sincronizarPartes();
+  const agrupadores = proyecto.funciones.filter(f => f.texto.trim() && f.prioridad === 'Imprescindible').map(f => f.texto.trim());
+  $('linea-v1').textContent = agrupadores.length
+    ? 'Tu versión 1 según Plan: ' + agrupadores.join(', ') + '. Abajo se estima por tareas, para no contar lo mismo dos veces.'
+    : 'Aún no has marcado funciones imprescindibles en Plan.';
+  const cont = $('lista-partes'); cont.innerHTML = '';
+  const ids = Object.keys(proyecto.partes);
+  ids.forEach(id => {
+    const p = proyecto.partes[id], manual = id.startsWith('x-');
+    const fila = document.createElement('div'); fila.className = 'parte';
+    const texto = document.createElement('div'); texto.className = 'parte-texto';
+    if (manual) {
+      const entrada = document.createElement('input'); entrada.value = p.texto; entrada.placeholder = 'Nombre de la parte';
+      entrada.oninput = () => { p.texto = entrada.value; };
+      texto.appendChild(entrada);
+    } else {
+      texto.textContent = p.texto;
+      const ref = referenciaDe(id);
+      if (ref) { const r = document.createElement('span'); r.className = 'rango'; r.textContent = 'Referencia orientativa: ' + ref[0] + '–' + ref[1] + ' h'; texto.appendChild(r); }
+    }
+    const horas = document.createElement('input'); horas.type = 'number'; horas.min = '0'; horas.className = 'parte-horas';
+    horas.value = p.horas; horas.placeholder = 'h'; horas.title = 'Horas de esta parte (las pones tú)';
+    horas.oninput = () => { p.horas = horas.value; pintarSuma(); };
+    fila.append(texto, horas);
+    if (manual) {
+      const b = document.createElement('button'); b.className = 'borrar-fila'; b.textContent = '🗑'; b.title = 'Borrar parte';
+      b.onclick = () => { delete proyecto.partes[id]; pintarPartes(); };
+      fila.appendChild(b);
+    }
+    cont.appendChild(fila);
+  });
+  const ex = excluidas();
+  $('lista-excluidas').innerHTML = ex.length
+    ? '<ul>' + ex.map(t => '<li>' + escapar(t) + '</li>').join('') + '</ul><p class="nota">Si entra algo de esto, las horas cambian.</p>'
+    : '<p class="nota">Nada marcado como «Después» o «No» en Idea, y ninguna función fuera de versión 1.</p>';
+  pintarSuma();
+}
+
+/* 6b. ESCENARIO de tarifa: ingreso deseado entre horas facturables. No es una tarifa suficiente ni de mercado */
+function tarifaCalculada() { const g = parseFloat(proyecto.ganarMes) || 0, h = parseFloat(proyecto.horasFacturables) || 0; return g > 0 && h > 0 ? g / h : 0; }
+function pintarTarifa() {
+  const t = tarifaCalculada();
+  $('tarifa-orientativa').textContent = t > 0
+    ? 'En ese escenario saldría a ' + t.toFixed(2).replace('.', ',') + ' €/h, antes de gastos e impuestos y contando solo las horas que cobras.'
+    : 'Rellena los dos campos para ver el escenario.';
+  const b = $('boton-usar-tarifa');
+  b.disabled = t <= 0;
+  b.textContent = t > 0 ? 'Usar ' + t.toFixed(2).replace('.', ',') + ' €/h como precio por hora' : 'Usar esta tarifa';
+}
 
 /* 7. ARRANQUE */
 function mostrarPestana(id) {
   document.querySelectorAll('.pestana').forEach(b => b.classList.toggle('activa', b.dataset.pestana === id));
   document.querySelectorAll('.panel').forEach(s => s.classList.toggle('activo', s.id === id));
+  if (id === 'presupuesto') pintarPartes();
 }
 function entrar() { $('pantalla-bienvenida').hidden = true; $('pantalla-app').hidden = false; }
 cargar(); pintarCampos();
 $('boton-entrar').onclick = entrar;
 document.querySelectorAll('.pestana').forEach(b => b.onclick = () => mostrarPestana(b.dataset.pestana));
-document.querySelectorAll('input,select,textarea').forEach(el => { if (!el.closest('.funcion')) el.addEventListener('input', recalcular); });
+document.querySelectorAll('input,select,textarea').forEach(el => { if (!el.closest('.funcion') && !el.closest('.parte')) el.addEventListener('input', recalcular); });
+$('boton-usar-horas').onclick = () => { const s = sumaPartes(); if (s > 0) { proyecto.horas = String(s); $('horas').value = proyecto.horas; recalcular(); mensaje('Horas copiadas; puedes seguir editándolas.'); } };
+$('boton-usar-tarifa').onclick = () => { const t = tarifaCalculada(); if (t > 0) { proyecto.precioHora = String(Math.round(t * 100) / 100); $('precio-hora').value = proyecto.precioHora; recalcular(); mensaje('Tarifa copiada; puedes seguir editándola.'); } };
+$('boton-anadir-parte').onclick = () => { let n = 1; while (proyecto.partes['x-' + n]) n++; proyecto.partes['x-' + n] = { texto: '', horas: '' }; pintarPartes(); };
+$('boton-referencias').onclick = () => {
+  let n = 0;
+  for (const id in proyecto.partes) {
+    const ref = referenciaDe(id);
+    if (ref && !(parseFloat(proyecto.partes[id].horas) > 0)) { proyecto.partes[id].horas = String(Math.round((ref[0] + ref[1]) / 2)); n++; }
+  }
+  pintarPartes();
+  mensaje(n ? 'Referencia aplicada a ' + n + ' parte(s) vacía(s); puedes cambiar cada una.' : 'No había partes vacías con referencia.');
+};
 $('boton-anadir').onclick = () => { proyecto.funciones.push({ texto: '', prioridad: 'Imprescindible' }); pintarFunciones(); };
 $('boton-guardar').onclick = () => { leerCampos(); guardar(); };
 $('boton-ejemplo').onclick = () => { proyecto = proyectoEjemplo(); pintarCampos(); mensaje('Ejemplo ficticio cargado (sin guardar).'); };
