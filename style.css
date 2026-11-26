@@ -49,3 +49,40 @@ summary{cursor:pointer;font-weight:600}
 .decision p{margin:0 0 6px}.opciones{display:flex;gap:6px}
 .opciones button{flex:1;height:38px;border:0;border-radius:8px;background:#e3e8ef;cursor:pointer;font-size:13px}
 .opciones button.elegida{background:#1f3a5f;color:#fff}
+
+
+/* 8. Tema oscuro (estilo 2: azul noche y turquesa) */
+body{background:#0f172a;color:#e2e8f0}
+.bienvenida{background:#0f172a}
+.bienvenida-caja{background:#1e293b;color:#e2e8f0}
+.cabecera{background:#1e293b;border-bottom:2px solid #14b8a6}
+.aviso-ejemplo{background:#422006;color:#fde68a}
+.menu{background:#0f172a;border-bottom:1px solid #334155}
+.pestana{background:#1e293b;color:#cbd5e1}
+.pestana.activa{background:#14b8a6;color:#042f2e;font-weight:700}
+.tarjeta{background:#1e293b;box-shadow:none;border:1px solid #334155;color:#e2e8f0}
+label{color:#94a3b8}
+input,select,textarea{background:#0f172a;border:1px solid #475569;color:#e2e8f0;border-radius:10px}
+.nota{color:#94a3b8}
+.boton{background:#14b8a6;color:#042f2e;font-weight:700;border-radius:10px}
+.boton.secundario{background:#334155;color:#e2e8f0}
+.borrar-fila{background:#7f1d1d;color:#fecaca}
+.opciones button{background:#334155;color:#e2e8f0;border-radius:10px}
+.opciones button.elegida{background:#14b8a6;color:#042f2e;font-weight:700}
+.etiqueta.hecho{background:#064e3b;color:#6ee7b7}
+.etiqueta.propuesta{background:#134e4a;color:#5eead4}
+.etiqueta.incognita{background:#451a03;color:#fdba74}
+.etiqueta.supuesto{background:#334155;color:#cbd5e1}
+.decision{border:1px solid #334155;background:#16203a}
+.total{color:#5eead4}
+td{border-bottom:1px solid #334155}
+summary{color:#e2e8f0}
+pre{background:#020617;border:1px solid #334155}
+.bienvenida-caja h1,.bienvenida-caja p{color:#e2e8f0}
+.bienvenida-caja .nota{color:#94a3b8}
+input::placeholder,textarea::placeholder{color:#64748b}
+select option{background:#0f172a;color:#e2e8f0}
+.pestana{border:0}
+.total{color:#5eead4}
+.cabecera span{opacity:.9}
+input:focus,select:focus,textarea:focus{outline:2px solid #14b8a6;border-color:#14b8a6}
