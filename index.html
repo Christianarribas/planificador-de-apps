@@ -14,12 +14,12 @@
     <h1>Planificador de Apps</h1>
     <p>Convierte una idea en un plan, unas instrucciones para la IA y un presupuesto.</p>
     <button id="boton-entrar" class="boton">Entrar</button>
-    <p class="nota">Borrador v0.1 · sin IA · los datos se guardan solo en este navegador.</p>
+    <p class="nota">Borrador v0.2 · sin IA · los datos se guardan solo en este navegador.</p>
   </div>
 </div>
 
 <div id="pantalla-app" hidden>
-  <header class="cabecera"><h1>Planificador de Apps</h1><span>borrador v0.1</span></header>
+  <header class="cabecera"><h1>Planificador de Apps</h1><span>borrador v0.2</span></header>
   <div id="aviso-ejemplo" class="aviso-ejemplo" hidden>EJEMPLO FICTICIO: estos datos no son de ningún cliente real. Pulsa «Vaciar todo» para vaciarlos.</div>
   <nav class="menu">
     <button class="pestana activa" data-pestana="idea">1 Idea</button>
@@ -78,8 +78,32 @@
     <!-- PESTAÑA 3: PRESUPUESTO -->
     <section id="presupuesto" class="panel">
       <div class="tarjeta">
-        <label>Horas de trabajo estimadas</label><input id="horas" type="number" min="0" placeholder="0">
+        <h2 class="titulo-tarjeta">1. ¿Qué incluye el trabajo?</h2>
+        <p class="nota">Esto sale de lo que has decidido en Idea y Plan. Las referencias de horas son un juicio orientativo para una versión sencilla hecha con ayuda de IA, con mucha incertidumbre: no son un coste real ni un precio de mercado. Las horas finales las pones tú.</p>
+        <p id="linea-v1" class="nota"></p>
+        <h3>Incluye (versión 1)</h3>
+        <div id="lista-partes"></div>
+        <div class="fila-botones">
+          <button id="boton-referencias" class="boton secundario">Rellenar vacías con la referencia</button>
+          <button id="boton-anadir-parte" class="boton secundario">+ Añadir otra parte</button>
+        </div>
+        <h3>No incluye</h3>
+        <div id="lista-excluidas"></div>
+        <p id="suma-partes" class="nota"></p>
+        <div class="fila-botones"><button id="boton-usar-horas" class="boton secundario" disabled>Usar estas horas</button></div>
+        <label>Horas de trabajo estimadas (las pones tú)</label><input id="horas" type="number" min="0" placeholder="0">
+      </div>
+      <div class="tarjeta">
+        <h2 class="titulo-tarjeta">2. Escenario: ¿a cuánto sale la hora?</h2>
+        <p class="nota">Solo un escenario de cálculo, no una tarifa suficiente ni de mercado: no cuenta gastos, impuestos ni el tiempo que no cobras (buscar clientes, aprender, gestionar).</p>
+        <label>Ingreso que te gustaría en un mes (€)</label><input id="ganar-mes" type="number" min="0" placeholder="Ej. 1000">
+        <label>Horas facturables al mes (las que de verdad cobras, no las que tienes libres)</label><input id="horas-facturables" type="number" min="0" placeholder="Ej. 40">
+        <p id="tarifa-orientativa" class="nota"></p>
+        <div class="fila-botones"><button id="boton-usar-tarifa" class="boton secundario" disabled>Usar esta tarifa</button></div>
         <label>Tu precio por hora (€)</label><input id="precio-hora" type="number" min="0" placeholder="0">
+      </div>
+      <div class="tarjeta">
+        <h2 class="titulo-tarjeta">3. Gastos e impuestos</h2>
         <label>Gastos únicos (dominio, diseño…) €</label><input id="gastos-unicos" type="number" min="0" placeholder="0">
         <label>Coste mensual de servicios (hosting, IA…) €</label><input id="gastos-mes" type="number" min="0" placeholder="0">
         <label>Horas de mantenimiento al mes</label><input id="horas-mes" type="number" min="0" placeholder="0">
@@ -87,7 +111,7 @@
         <label>IVA % (lo pones tú)</label><input id="iva" type="number" min="0" placeholder="0">
       </div>
       <div class="tarjeta" id="resultado-presupuesto"></div>
-      <p class="nota">Solo calcula con los números que introduces. No sugiere precios de mercado.</p>
+      <p class="nota">Solo suma los números que introduces. Las horas, la tarifa y el precio final son decisión tuya; el «pago único» es lo que cuesta hacerla en tu escenario, no lo que debes cobrar.</p>
     </section>
 
     <div class="fila-botones pie">
